@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Login Screen</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;900&display=swap" rel="stylesheet">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <!-- Our stylesheet -->
+    <style>
+        body {
+            background-color: #121212;
+            color: #D5FA05;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .box {
+            background-color: #121212;
+            color: #D5FA05;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .box h1 {
+            margin-bottom: 20px;
+        }
+
+        .box img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        .form-control,
+        .form-select {
+            background-color: #383838;
+            color: white;
+            border: 1px solid #383838;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            height: 50px;
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background-color: #383838;
+            color: white;
+            border: 1px solid #383838;
+            border-radius: 5px;
+            outline: none;
+            box-shadow: 0 0 5px rgba(213, 250, 5, 0.7);
+        }
+
+        .btn-primary {
+            background-color: #D5FA05;
+            color: #121212;
+            border: 1px solid #D5FA05;
+            border-radius: 5px;
+            padding: 12px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 24px;
+            font-weight: 500;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .btn-primary:hover {
+            background-color: #B4DA04;
+            color: #121212;
+        }
+
+        .form-control::placeholder,
+        .form-select::placeholder {
+            color: white;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="box">
+            <img src="Logo.png" alt="Image Description">
+            <h1>Login Screen</h1>
+            <input type="email" id="email" placeholder="Email" class="form-control">
+            <input type="password" id="password" placeholder="Password" class="form-control">
+            <button onclick="login()" class="btn-primary">Login</button>
+        </div>
+    </div>
+
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+         https://firebase.google.com/docs/web/setup#available-libraries -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+
+    <!-- Your script must be loaded after firebase references -->
+    <script src="index.js"></script>
+</body>
+
+</html>

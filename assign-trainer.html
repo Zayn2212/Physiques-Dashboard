@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Physique - Assign Trainer</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bowlby+One+SC&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+    <style>
+        body {
+            background-color: #121212;
+            color: #D5FA05;
+            font-family: 'Montserrat'
+        }
+
+        .navbar {
+            background-color: #121212;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .main {
+            padding: 60px 20px 20px;
+        }
+
+        .navbar-brand,
+        .navbar-nav a {
+            color: #D5FA05 !important;
+        }
+
+        .navbar-nav .active {
+            font-weight: bold;
+            color: #D5FA05 !important;
+        }
+
+        .navbar-nav .nav-link:not(.active) {
+            color: #808080 !important;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        .box {
+            background-color: #121212;
+            color: #D5FA05;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .box h1 {
+            text-align: center;
+        }
+
+        .list-group-item {
+            background-color: #383838B2;
+            color: white;
+            border: 1px solid #383838B2;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            padding: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .list-group-item img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-right: 10px;
+            margin-left: 20px;
+        }
+
+        .list-group-item hr {
+            margin: 10px 0;
+            border: none;
+            border-top: 1px solid #808080;
+        }
+
+        #userDetailsModal {
+            background-color: #121212;
+        }
+
+        .modal-content {
+            background-color: #383838B2;
+            color: white;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #808080;
+        }
+
+        .modal-title {
+            color: #D5FA05;
+        }
+
+        .modal-body label {
+            color: #D5FA05;
+        }
+
+        .btn-primary {
+            background-color: #D5FA05;
+            color: #121212;
+            border: 1px solid #D5FA05;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            box-shadow: 0 0 5px rgba(213, 250, 5, 0.7) !important;
+        }
+
+        .btn-primary:hover {
+            background-color: #B4DA04 !important;
+            color: #121212;
+        }
+
+        .btn-primary:focus,
+        .btn-primary:active {
+            box-shadow: 0 0 5px rgba(213, 250, 5, 0.7) !important;
+        }
+
+        .form-control:focus {
+            background-color: #383838B2;
+            color: white;
+            border: 1px solid #383838B2;
+            border-radius: 5px;
+            outline: none;
+            box-shadow: 0 0 5px rgba(213, 250, 5, 0.7);
+        }
+
+        .form-control {
+            background-color: #383838B2;
+            color: white;
+            border: 1px solid #383838B2;
+            border-radius: 5px;
+        }
+
+        .modal-label {
+            color: #becb65 !important;
+            font-weight: bold;
+        }
+
+        #userSearchInput {
+            color: rgb(236, 233, 233) !important;
+        }
+
+        #userSearchInput::placeholder {
+            color: gray;
+        }
+
+        .search-form {
+            max-width: 100%;
+            margin: auto;
+            border-radius: 5px;
+            padding: 10px;
+            display: flex;
+        }
+
+        .btn-search {
+            color: #D5FA05;
+            border: 1px solid #D5FA05 !important;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            box-shadow: #D5FA05 !important;
+        }
+
+        .btn-search:hover {
+            background-color: #D5FA05 !important;
+            color: #121212;
+        }
+
+        .btn-search:focus,
+        .btn-search:active {
+            box-shadow: #D5FA05 !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg bg-body-tertiary" class="navbar bg-dark border-bottom border-body"
+        data-bs-theme="dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" aria-current="page" href="Dashboard.html">Dashboard</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+                aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                    <a class="nav-link" href="user-registration.html">User Registration</a>
+                    <a class="nav-link" href="trainer-Registration.html">Trainer Registration</a>
+                    <a class="nav-link" href="user-details.html">User Details</a>
+                    <a class="nav-link" href="trainer-details.html">Trainer Details</a>
+                    <a class="nav-link active" aria-current="page" href="assign-trainer.html">Assign Trainer</a>
+                    <a class="nav-link" href="#" onclick="signOut()">Sign out</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main">
+        <div class="con">
+            <div class="box">
+                <h1>Trainers</h1>
+                <form class="search-form d-flex mb-3">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"
+                        id="userSearchInput">
+                    <button class="btn btn-search" type="button">Search</button>
+                </form>
+                <ul id="trainerList" class="list-group"></ul>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bootstrap Modal for displaying total Clients -->
+    <div class="modal fade" id="clientsModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <!-- Modal content goes here -->
+                <div class="modal-header" id="clientsModalHeader">
+                </div>
+                <div class="modal-body" id="clientsModalBody">
+                    <!-- You can add any content or form fields here -->
+                </div>
+                <div class="modal-footer" id="clientsModalFooter">
+                    <!-- You can add additional buttons here if needed -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+    <!-- Add Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyDEM0AQkqOoBgOUJeWwk-ZbbYNYwT87beY",
+            authDomain: "physiques2.firebaseapp.com",
+            projectId: "physiques2",
+            storageBucket: "physiques2.appspot.com",
+            messagingSenderId: "174104508999",
+            appId: "1:174104508999:web:8f994f2c1d52aeb53b0f62",
+            measurementId: "G-VRMNPEM3XH"
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        var firestore = firebase.firestore();
+        var auth = firebase.auth();
+
+        // Fetch user details and display on the page
+        var trainerListElement = document.getElementById('trainerList');
+
+        if (trainerListElement) {
+            // Fetch user details
+            firestore.collection('trainer').get().then((querySnapshot) => {
+                var trainersArray = querySnapshot.docs.map(doc => doc.data());
+
+                // Add input event listener to the search input for real-time filtering
+                var searchInput = document.getElementById('userSearchInput');
+                searchInput.addEventListener('input', function () {
+                    var searchTerm = searchInput.value.toLowerCase();
+
+                    // Filter users based on the search term
+                    var filteredtrainers = trainersArray.filter(user =>
+                        user.Name.toLowerCase().includes(searchTerm) || user.uniqueID.includes(searchTerm)
+                    );
+
+                    // Clear existing content and display the filtered users
+                    trainerListElement.innerHTML = '';
+                    displayTrainers(filteredtrainers);
+                });
+
+                // Display all users initially
+                displayTrainers(trainersArray);
+            }).catch((error) => {
+                console.error('Error fetching trainer details: ', error);
+            });
+        } else {
+            console.error('Trainer list element not found in the document.');
+        }
+
+        function displayTrainers(trainerArray) {
+            trainerArray.forEach((userData) => {
+                var trainerName = userData.Name;
+                var trainerUniqueID = userData.uniqueID;
+                var trainerProfilePicture = userData.profilePicture;
+                var trainerActivity = userData.Activity;
+
+                var listItem = document.createElement('li');
+                listItem.classList.add('d-flex', 'align-items-center', 'justify-content-between');
+
+                var imgElement = document.createElement('img');
+                imgElement.alt = 'Profile Picture';
+                imgElement.style.width = '60px'; 
+                imgElement.style.height = '60px';
+                imgElement.style.borderRadius = '50%';
+                imgElement.style.marginRight = '20px';
+
+
+                if (trainerProfilePicture) {
+                    imgElement.src = trainerProfilePicture;
+                } else {
+                    // Set a default image if no profile picture is available
+                    imgElement.src = 'Logo.png';
+                }
+
+
+                var trainerDetailsContainer = document.createElement('div');
+                trainerDetailsContainer.classList.add('d-flex', 'align-items-center', 'flex-row');
+
+                var nameContainer = document.createElement('div');
+                nameContainer.style.color = 'rgba(255, 255, 255, 0.8)';
+                nameContainer.innerHTML = `<div style="font-size: 18px;">Name: ${trainerName}</div><div style="font-size: 16px;">UniqueID: ${trainerUniqueID}</div>`;
+
+                trainerDetailsContainer.appendChild(imgElement);
+                trainerDetailsContainer.appendChild(nameContainer);
+
+                listItem.appendChild(trainerDetailsContainer);
+
+
+
+                // Create buttons
+                var totalClientsButton = document.createElement('button');
+                totalClientsButton.classList.add('btn', 'btn-secondary', 'mx-2');
+                totalClientsButton.innerText = 'Total Clients';
+
+                var addClientsButton = document.createElement('button');
+                addClientsButton.classList.add('btn', 'btn-success', 'mx-2');
+                addClientsButton.innerText = 'Add Clients';
+
+                // Add event listeners to the buttons
+                totalClientsButton.addEventListener('click', function () {
+                    fetchUsers(trainerUniqueID, trainerActivity, 'total');
+                });
+
+                addClientsButton.addEventListener('click', function () {
+                    fetchUsers(trainerUniqueID, trainerActivity, 'add');
+                });
+
+
+                // Append buttons to the list item
+                listItem.appendChild(totalClientsButton);
+                listItem.appendChild(addClientsButton);
+
+                trainerListElement.appendChild(listItem);
+
+
+                // Add a horizontal line after each listItem
+                var horizontalLine = document.createElement('hr');
+                trainerListElement.appendChild(horizontalLine);
+            });
+        }
+
+        function fetchUsers(trainerID, activity, button) {
+            var totalUsers = [];
+            var addUsers = [];
+
+            firestore.collection('users').get().then((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    var userData = doc.data();
+
+
+                    if (userData.trainer === trainerID) {
+                        totalUsers.push({ id: doc.id, ...userData });
+                    } else if (userData.trainer === '000000000') {
+                        addUsers.push({ id: doc.id, ...userData });
+                    }
+                });
+
+                openModal(totalUsers, addUsers, button, trainerID)
+            }).catch((error) => {
+                console.error('Error fetching users: ', error);
+            });
+        }
+
+        function openModal(totalUsers, addUsers, button, trainerID) {
+            var Modal = new bootstrap.Modal(document.getElementById('clientsModal'));
+            var modalHeader = document.getElementById('clientsModalHeader');
+            var modalBody = document.getElementById('clientsModalBody');
+            var modalFooter = document.getElementById('clientsModalFooter');
+            var selectedUsers = [];
+
+
+            // Clear previous content
+            modalHeader.innerHTML = '';
+            modalBody.innerHTML = '';
+            modalFooter.innerHTML = '';
+
+            if (button === 'total') {
+                var closeButton = document.createElement('button');
+                closeButton.type = 'button';
+                closeButton.classList.add('btn-close');
+                closeButton.setAttribute('data-bs-dismiss', 'modal');
+                closeButton.setAttribute('aria-label', 'Close');
+
+                var headerElement = document.createElement('div');
+                headerElement.innerHTML = `<div class="me-auto" style="font-size: 20px;">Total Clients</div>`;
+                headerElement.style.marginLeft = 'auto';
+
+                const searchInput = document.createElement('input');
+                searchInput.type = 'text';
+                searchInput.classList.add('form-control');
+                searchInput.placeholder = 'Search users by Name or ID';
+                searchInput.style.width = '100%';
+                searchInput.style.padding = '8px';
+                searchInput.style.borderRadius = '5px';
+                searchInput.style.border = '1px solid #D5FA05';
+                searchInput.style.color = 'white';
+                searchInput.style.marginLeft = '50px';
+                searchInput.style.marginRight = '70px';
+
+                var headerContainer = document.createElement('div');
+                headerContainer.classList.add('d-flex', 'align-items-center');
+                headerContainer.appendChild(headerElement);
+                headerContainer.appendChild(searchInput);
+                headerContainer.appendChild(closeButton);
+
+                modalHeader.appendChild(headerContainer);
+
+                searchInput.addEventListener('input', function () {
+                    var searchTerm = searchInput.value.trim().toLowerCase();
+
+                    // Filter users based on the search term
+                    var filteredUsers = totalUsers.filter(user =>
+                        user.Name.toLowerCase().includes(searchTerm) || user.uniqueID.includes(searchTerm)
+                    );
+
+                    // Clear existing content and display the filtered users
+                    modalBody.innerHTML = '';
+                    displayUsers(filteredUsers);
+                });
+
+                displayUsers(totalUsers);
+
+                function displayUsers(usersArray) {
+                    selectedUsers = [];
+
+                    usersArray.forEach(user => {
+                        var userContainer = document.createElement('div');
+                        userContainer.classList.add('d-flex', 'align-items-center');
+
+                        var imgElement = document.createElement('img');
+                        imgElement.src = user.profilePicture || 'Logo.png';
+                        imgElement.alt = 'Profile Picture';
+                        imgElement.style.width = '50px';
+                        imgElement.style.height = '50px';
+                        imgElement.style.borderRadius = '50%';
+                        imgElement.style.marginRight = '20px';
+                        imgElement.classList.add('user-profile-pic');
+
+                        var nameElement = document.createElement('div');
+                        nameElement.style.color = 'rgba(255, 255, 255, 0.8)';
+                        nameElement.innerHTML = `<div style="font-size: 14px;">Name: ${user.Name}</div><div style="font-size: 12px;">UniqueID: ${user.uniqueID}</div>`;
+
+                        var activityCircle = document.createElement('div');
+                        activityCircle.style.width = '15px';
+                        activityCircle.style.height = '15px';
+                        activityCircle.style.borderRadius = '50%';
+                        activityCircle.style.marginLeft = 'auto';
+                        activityCircle.style.border = '1px solid #D5FA05';
+                        activityCircle.style.backgroundColor = user.Activity ? '#D5FA05' : '#121212';
+
+                        var touchableCircle = document.createElement('div');
+                        touchableCircle.classList.add('touchable-circle');
+                        touchableCircle.onclick = function () {
+                            handleTouch(user.id, selectedUsers, touchableCircle, plusSign, minusSign);
+                        };
+                        touchableCircle.style.width = '15px';
+                        touchableCircle.style.height = '15px';
+                        touchableCircle.style.borderRadius = '50%';
+                        touchableCircle.style.marginLeft = '20px';
+                        touchableCircle.style.backgroundColor = '#121212';
+                        touchableCircle.style.display = 'flex';
+                        touchableCircle.style.border = '1px solid #D5FA05';
+                        touchableCircle.style.alignItems = 'center';
+                        touchableCircle.style.justifyContent = 'center';
+                        touchableCircle.style.cursor = 'pointer';
+
+                        var minusSign = document.createElement('div');
+                        minusSign.classList.add('minus-sign');
+                        minusSign.style.marginBottom = '2.3px';
+                        minusSign.style.color = '#D5FA05';
+                        minusSign.innerText = '+';
+
+                        var plusSign = document.createElement('div');
+                        plusSign.classList.add('plus-sign');
+                        plusSign.style.marginBottom = '2.3px';
+                        plusSign.style.color = '#D5FA05';
+                        plusSign.innerText = '-';
+
+                        updateSign(user.id, touchableCircle, selectedUsers, plusSign, minusSign);
+
+                        var horizontalLine = document.createElement('hr');
+                        horizontalLine.style.margin = '10px 0';
+
+                        userContainer.appendChild(imgElement); //Adding Image
+                        userContainer.appendChild(nameElement); //Adding Name and ID
+                        userContainer.appendChild(activityCircle); //Adding Cricle
+                        userContainer.appendChild(touchableCircle);// Adding minus circle
+                        modalBody.appendChild(userContainer);
+                        modalBody.appendChild(horizontalLine); // Adding line
+                    });
+
+                    // Set a fixed height and make the modal body scrollable
+                    modalBody.style.height = '431px';
+                    modalBody.style.overflowY = 'auto';
+                }
+
+
+                var saveButton = createButton('Save Changes', function () {
+                    removeClients(selectedUsers);
+                });
+
+                // Append the button to the modalFooter
+                modalFooter.appendChild(saveButton);
+
+
+                Modal.show();
+            } else if (button === 'add') {
+                var closeButton = document.createElement('button');
+                closeButton.type = 'button';
+                closeButton.classList.add('btn-close');
+                closeButton.setAttribute('data-bs-dismiss', 'modal');
+                closeButton.setAttribute('aria-label', 'Close');
+
+                var headerElement = document.createElement('div');
+                headerElement.innerHTML = `<div class="me-auto" style="font-size: 20px;">Add Clients</div>`;
+                headerElement.style.marginLeft = 'auto';
+
+                const searchInput = document.createElement('input');
+                searchInput.type = 'text';
+                searchInput.classList.add('form-control');
+                searchInput.placeholder = 'Search users by Name or ID';
+                searchInput.style.width = '100%';
+                searchInput.style.padding = '8px';
+                searchInput.style.borderRadius = '5px';
+                searchInput.style.border = '1px solid #D5FA05';
+                searchInput.style.color = 'white';
+                searchInput.style.marginLeft = '50px';
+                searchInput.style.marginRight = '70px';
+
+                var headerContainer = document.createElement('div');
+                headerContainer.classList.add('d-flex', 'align-items-center');
+                headerContainer.appendChild(headerElement);
+                headerContainer.appendChild(searchInput);
+                headerContainer.appendChild(closeButton);
+
+                modalHeader.appendChild(headerContainer);
+
+                searchInput.addEventListener('input', function () {
+                    var searchTerm = searchInput.value.trim().toLowerCase();
+
+                    // Filter users based on the search term
+                    var filteredUsers = addUsers.filter(user =>
+                        user.Name.toLowerCase().includes(searchTerm) || user.uniqueID.includes(searchTerm)
+                    );
+
+                    // Clear existing content and display the filtered users
+                    modalBody.innerHTML = '';
+                    displayUsersAdd(filteredUsers);
+                });
+
+                displayUsersAdd(addUsers);
+
+                function displayUsersAdd(usersArray) {
+                    selectedUsers = [];
+                    
+                    usersArray.forEach(user => {
+                        var userContainer = document.createElement('div');
+                        userContainer.classList.add('d-flex', 'align-items-center');
+
+                        var imgElement = document.createElement('img');
+                        imgElement.src = user.profilePicture || 'Logo.png';
+                        imgElement.alt = 'Profile Picture';
+                        imgElement.style.width = '50px';
+                        imgElement.style.height = '50px';
+                        imgElement.style.borderRadius = '50%';
+                        imgElement.style.marginRight = '20px';
+                        imgElement.classList.add('user-profile-pic');
+
+                        var nameElement = document.createElement('div');
+                        nameElement.style.color = 'rgba(255, 255, 255, 0.8)';
+                        nameElement.innerHTML = `<div style="font-size: 14px;">Name: ${user.Name}</div><div style="font-size: 12px;">UniqueID: ${user.uniqueID}</div>`;
+
+                        var activityCircle = document.createElement('div');
+                        activityCircle.style.width = '15px';
+                        activityCircle.style.height = '15px';
+                        activityCircle.style.borderRadius = '50%';
+                        activityCircle.style.marginLeft = 'auto';
+                        activityCircle.style.border = '1px solid #D5FA05';
+                        activityCircle.style.backgroundColor = user.Activity ? '#D5FA05' : '#121212';
+
+                        var touchableCircle = document.createElement('div');
+                        touchableCircle.classList.add('touchable-circle');
+                        touchableCircle.onclick = function () {
+                            handleTouch(user.id, selectedUsers, touchableCircle, plusSign, minusSign);
+                        };
+                        touchableCircle.style.width = '15px';
+                        touchableCircle.style.height = '15px';
+                        touchableCircle.style.borderRadius = '50%';
+                        touchableCircle.style.marginLeft = '20px';
+                        touchableCircle.style.backgroundColor = '#383838B2';
+                        touchableCircle.style.display = 'flex';
+                        touchableCircle.style.border = '1px solid #D5FA05';
+                        touchableCircle.style.alignItems = 'center';
+                        touchableCircle.style.justifyContent = 'center';
+                        touchableCircle.style.cursor = 'pointer';
+
+                        var minusSign = document.createElement('div');
+                        minusSign.classList.add('minus-sign');
+                        minusSign.style.marginBottom = '2.3px';
+                        minusSign.style.color = '#D5FA05';
+                        minusSign.innerText = '-';
+
+                        var plusSign = document.createElement('div');
+                        plusSign.classList.add('plus-sign');
+                        plusSign.style.marginBottom = '2.3px';
+                        plusSign.style.color = '#D5FA05';
+                        plusSign.innerText = '+';
+
+                        updateSign(user.id, touchableCircle, selectedUsers, plusSign, minusSign);
+
+                        var horizontalLine = document.createElement('hr');
+                        horizontalLine.style.margin = '10px 0';
+
+                        userContainer.appendChild(imgElement); //Adding Image
+                        userContainer.appendChild(nameElement); //Adding Name and ID
+                        userContainer.appendChild(activityCircle); //Adding Cricle
+                        userContainer.appendChild(touchableCircle);// Adding minus circle
+                        modalBody.appendChild(userContainer);
+                        modalBody.appendChild(horizontalLine); // Adding line
+                    });
+                }
+
+
+
+                // Set a fixed height and make the modal body scrollable
+                modalBody.style.height = '431px'; // Set the desired height
+                modalBody.style.overflowY = 'auto';
+
+                var saveButton = createButton('Save Changes', function () {
+                    addClients(selectedUsers, trainerID);
+                });
+
+                // Append the button to the modalFooter
+                modalFooter.appendChild(saveButton);
+
+                Modal.show();
+            }
+        }
+
+        function handleTouch(docID, selectedUsers, touchableCircle, plusSign, minusSign) {
+            var index = selectedUsers.indexOf(docID);
+
+            if (index !== -1) {
+                selectedUsers.splice(index, 1);
+            } else {
+                selectedUsers.push(docID);
+            }
+
+            updateSign(docID, touchableCircle, selectedUsers, plusSign, minusSign);
+        }
+
+        function updateSign(userId, element, selectedUsers, plusSign, minusSign) {
+            element.innerHTML = ''; // Clear the existing content
+
+            var isUserSelected = selectedUsers.includes(userId);
+
+            if (isUserSelected) {
+                element.appendChild(minusSign);
+            } else {
+                element.appendChild(plusSign);
+            }
+        }
+
+        function createButton(text, onClick) {
+            var button = document.createElement('button');
+            button.classList.add('btn', 'btn-secondary');
+            button.innerText = text;
+            button.style.marginRight = '170px';
+            button.style.backgroundColor = '#D5FA05';
+            button.style.color = '#000000';
+            button.style.fontWeight = '500';
+            button.onclick = onClick;
+            return button;
+        }
+
+        function addClients(selectedUsers, trainerID) {
+            var updatePromises = [];
+
+            selectedUsers.forEach(userId => {
+                var userRef = firestore.collection('users').doc(userId);
+
+                // Add the promise for the user update to the array
+                updatePromises.push(
+                    userRef.update({
+                        trainer: trainerID,
+                    })
+                        .then(() => {
+                            console.log(`User with ID ${userId} updated successfully.`);
+                        })
+                        .catch(error => {
+                            console.error(`Error updating user with ID ${userId}:`, error);
+                        })
+                );
+            });
+
+            // Use Promise.all to wait for all updates to complete
+            Promise.all(updatePromises)
+                .then(() => {
+                    console.log('All user updates completed successfully.');
+
+                    // Close the modal after updating
+                    var Modal = new bootstrap.Modal(document.getElementById('clientsModal'));
+                    Modal.hide();
+
+                    // Perform any additional steps after closing the modal
+                    alert('User details updated successfully');
+                    window.location.href = 'assign-trainer.html';
+                })
+                .catch(error => {
+                    console.error('Error updating users:', error);
+                    // Handle errors if needed
+                });
+        }
+
+
+        function removeClients(selectedUsers) {
+            var updatePromises = [];
+
+            // Iterate through each selected user
+            selectedUsers.forEach(userId => {
+                var userRef = firestore.collection('users').doc(userId);
+
+                // Add the promise for the user update to the array
+                updatePromises.push(
+                    userRef.update({
+                        trainer: '000000000', //give default trainer id
+                    })
+                        .then(() => {
+                            console.log(`User with ID ${userId} updated successfully.`);
+                        })
+                        .catch(error => {
+                            console.error(`Error updating user with ID ${userId}:`, error);
+                        })
+                );
+            });
+
+            // Use Promise.all to wait for all updates to complete
+            Promise.all(updatePromises)
+                .then(() => {
+                    console.log('All user updates completed successfully.');
+
+                    // Close the modal after updating
+                    var Modal = new bootstrap.Modal(document.getElementById('clientsModal'));
+                    Modal.hide();
+
+                    // Perform any additional steps after closing the modal
+                    alert('User details updated successfully');
+                    window.location.href = 'assign-trainer.html';
+                })
+                .catch(error => {
+                    console.error('Error updating users:', error);
+                    // Handle errors if needed
+                });
+        }
+
+        function signOut() {
+            auth.signOut().then(function () {
+                // Sign-out successful.
+                console.log("Admin signed out");
+                alert("Admin signed out Sucessfully");
+                // Redirect to the sign-in or home page if needed
+                window.location.href = "index.html";
+            }).catch(function (error) {
+                // An error happened.
+                console.error("Error signing out:", error);
+
+            });
+        }
+
+        // Add this function to check if the user is signed in on each page load
+        function checkAuthState() {
+            auth.onAuthStateChanged(function (user) {
+                if (!user) {
+                    // If the user is not signed in, redirect to the sign-in or home page
+                    window.location.href = "index.html";
+                }
+            });
+        }
+
+        // Call the checkAuthState function when the page loads
+        checkAuthState();
+
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bowlby+One+SC&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+    <style>
+        body {
+            background-color: #121212;
+            color: #D5FA05;
+            font-family: 'Montserrat';
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .navbar {
+            background-color: #121212;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .main {
+            padding: 60px 20px 20px;
+        }
+
+        .navbar-brand,
+        .navbar-nav a {
+            color: #D5FA05 !important;
+        }
+
+        .navbar-nav .active {
+            font-weight: bold;
+            color: #D5FA05 !important;
+        }
+
+        .navbar-nav .nav-link:not(.active) {
+            color: #808080 !important;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        .box {
+            background-color: #121212;
+            color: #D5FA05;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .box h1 {
+            text-align: center;
+        }
+
+        .list-group-item {
+            background-color: #383838B2;
+            color: white;
+            border: 1px solid #383838B2;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            padding: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .list-group-item img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-right: 10px;
+            margin-left: 20px;
+        }
+
+        .list-group-item hr {
+            margin: 10px 0;
+            border: none;
+            border-top: 1px solid #808080;
+        }
+
+        .modal-content {
+            background-color: #383838B2;
+            color: white;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #808080;
+        }
+
+        .modal-title {
+            color: #D5FA05;
+        }
+
+        .modal-body label {
+            color: #D5FA05;
+        }
+
+        .btn-primary {
+            background-color: #D5FA05;
+            color: #121212;
+            border: 1px solid #D5FA05;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            box-shadow: 0 0 5px rgba(213, 250, 5, 0.7) !important;
+        }
+
+        .btn-primary:hover {
+            background-color: #B4DA04 !important;
+            color: #121212;
+        }
+
+        .btn-primary:focus,
+        .btn-primary:active {
+            box-shadow: 0 0 5px rgba(213, 250, 5, 0.7) !important;
+        }
+
+        .form-control:focus {
+            background-color: #383838B2;
+            color: white;
+            border: 1px solid #383838B2;
+            border-radius: 5px;
+            outline: none;
+            box-shadow: 0 0 5px rgba(213, 250, 5, 0.7);
+        }
+
+        .form-control {
+            background-color: #383838B2;
+            color: white;
+            border: 1px solid #383838B2;
+            border-radius: 5px;
+        }
+
+
+        .modal-label {
+            color: #becb65 !important;
+            font-weight: bold;
+        }
+
+        .form-check-input {
+            background-color: #2F2F2F !important;
+            border-color: black !important;
+        }
+
+        .form-check-input+.form-check-label::before {
+            border-color: #2F2F2F !important;
+        }
+
+        .form-check-input:checked {
+            background-color: #D5FA05 !important;
+            border-color: #D5FA05 !important;
+        }
+
+        .form-check-input:checked+.form-check-label::before {
+            border-color: #2F2F2F !important;
+        }
+
+        #userSearchInput {
+            color: rgb(236, 233, 233) !important;
+        }
+
+        #userSearchInput::placeholder {
+            color: gray;
+        }
+
+        .search-form {
+            max-width: 100%;
+            margin: auto;
+            border-radius: 5px;
+            padding: 10px;
+            display: flex;
+        }
+
+        .btn-search {
+            color: #D5FA05;
+            border: 1px solid #D5FA05 !important;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            box-shadow: #D5FA05 !important;
+        }
+
+        .btn-search:hover {
+            background-color: #D5FA05 !important;
+            color: #121212;
+        }
+
+        .btn-search:focus,
+        .btn-search:active {
+            box-shadow: #D5FA05 !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg bg-body-tertiary" class="navbar bg-dark border-bottom border-body"
+        data-bs-theme="dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" aria-current="page" href="Dashboard.html">Dashboard</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+                aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                    <a class="nav-link" href="user-registration.html">User Registration</a>
+                    <a class="nav-link" href="trainer-Registration.html">Trainer Registration</a>
+                    <a class="nav-link" href="user-details.html">User Details</a>
+                    <a class="nav-link active" aria-current="page" href="trainer-details.html">Trainer Details</a>
+                    <a class="nav-link" href="assign-trainer.html">Assign Trainer</a>
+                    <a class="nav-link" href="#" onclick="signOut()">Sign out</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main">
+        <div class="con">
+            <div class="box">
+                <h1>Trainers Details</h1>
+                <form class="search-form d-flex mb-3">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"
+                        id="userSearchInput">
+                    <button class="btn btn-search" type="button">Search</button>
+                </form>
+                <ul id="trainerList" class="list-group"></ul>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bootstrap Modal for displaying additional user information -->
+    <div class="modal fade" id="trainerDetailsModal" tabindex="-1" aria-labelledby="trainerDetailsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="trainerDetailsModalLabel">Edit Trainer Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="trainerDetailsModalBody">
+                    <form id="editTrainerForm">
+                        <!-- Add form elements for editing user details here -->
+                        <div class="mb-3">
+                            <label for="editTrainerName" class="form-label modal-label">Name:</label>
+                            <input type="text" class="form-control" id="editTrainerName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPhoneNumber" class="form-label modal-label">Phone Number:</label>
+                            <input type="tel" class="form-control" id="editPhoneNumber" required>
+                        </div>
+                        <div class="mb-3 d-flex justify-content-between">
+                            <label for="editActivity" class="form-label modal-label">Activity:</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="editActivity">
+                            </div>
+                        </div>
+
+                        <!-- Add more form elements as needed -->
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+    <!-- Add Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyDEM0AQkqOoBgOUJeWwk-ZbbYNYwT87beY",
+            authDomain: "physiques2.firebaseapp.com",
+            projectId: "physiques2",
+            storageBucket: "physiques2.appspot.com",
+            messagingSenderId: "174104508999",
+            appId: "1:174104508999:web:8f994f2c1d52aeb53b0f62",
+            measurementId: "G-VRMNPEM3XH"
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        var firestore = firebase.firestore();
+        var auth = firebase.auth();
+
+        // Fetch user details and display on the page
+        var trainerListElement = document.getElementById('trainerList');
+
+        if (trainerListElement) {
+            // Fetch user details
+            firestore.collection('trainer').get().then((querySnapshot) => {
+                var trainersArray = querySnapshot.docs.map(doc => doc.data());
+
+                // Add input event listener to the search input for real-time filtering
+                var searchInput = document.getElementById('userSearchInput');
+                searchInput.addEventListener('input', function () {
+                    var searchTerm = searchInput.value.toLowerCase();
+
+                    // Filter users based on the search term
+                    var filteredtrainers = trainersArray.filter(user =>
+                        user.Name.toLowerCase().includes(searchTerm) || user.uniqueID.includes(searchTerm)
+                    );
+
+                    // Clear existing content and display the filtered users
+                    trainerListElement.innerHTML = '';
+                    displayTrainers(filteredtrainers);
+                });
+
+                // Display all users initially
+                displayTrainers(trainersArray);
+            }).catch((error) => {
+                console.error('Error fetching trainer details: ', error);
+            });
+        } else {
+            console.error('Trainer list element not found in the document.');
+        }
+
+        function displayTrainers(trainerArray) {
+            trainerArray.forEach((userData) => {
+                var trainerName = userData.Name;
+                var trainerUniqueID = userData.uniqueID;
+                var trainerProfilePicture = userData.profilePicture;
+                var trainerPhoneNo = userData.phoneNumber;
+                var trainerActivity = userData.Activity;
+
+
+                var listItem = document.createElement('li');
+                listItem.classList.add('d-flex', 'align-items-center');
+
+                var imgElement = document.createElement('img');
+                imgElement.alt = 'Profile Picture';
+                imgElement.style.width = '60px';
+                imgElement.style.height = '60px';
+                imgElement.style.borderRadius = '50%';
+                imgElement.style.marginRight = '10px';
+                imgElement.style.marginLeft = '20px';
+
+                if (trainerProfilePicture) {
+                    imgElement.src = trainerProfilePicture;
+                } else {
+                    // Set a default image if no profile picture is available
+                    imgElement.src = 'Logo.png';
+                }
+
+                listItem.appendChild(imgElement);
+
+                var trainerDetailsContainer = document.createElement('div');
+                trainerDetailsContainer.style.color = 'rgba(255, 255, 255, 0.8)';
+                trainerDetailsContainer.style.marginLeft = '10px';
+
+                trainerDetailsContainer.innerHTML = `<div style="font-size: 18px;">Name: ${trainerName}</div><div style="font-size: 16px;">UniqueID: ${trainerUniqueID}</div>`;
+                listItem.appendChild(trainerDetailsContainer);
+
+                var activityCircle = document.createElement('div');
+                activityCircle.style.width = '20px';
+                activityCircle.style.height = '20px';
+                activityCircle.style.borderRadius = '50%';
+                activityCircle.style.marginLeft = 'auto';
+                activityCircle.style.marginRight = '20px';
+                activityCircle.style.backgroundColor = trainerActivity ? '#D5FA05' : '#2F2F2F';
+
+                listItem.appendChild(activityCircle);
+
+                listItem.style.cursor = 'pointer';
+                listItem.setAttribute('data-bs-toggle', 'modal');
+                listItem.setAttribute('data-bs-target', '#trainerDetailsModal');
+                listItem.addEventListener('click', function () {
+                    showTrainerDetailsModal(trainerName, trainerPhoneNo, trainerUniqueID, trainerActivity);
+                });
+
+                trainerListElement.appendChild(listItem);
+
+                var horizontalLine = document.createElement('hr');
+                trainerListElement.appendChild(horizontalLine);
+            });
+        }
+
+        function showTrainerDetailsModal(name, phoneNumber, uniqueId, activity) {
+            var modalBody = document.getElementById('trainerDetailsModalBody');
+            var edittrainerForm = document.getElementById('editTrainerForm');
+
+            getTrainerDocumentIdByUniqueId(uniqueId).then((trainerDocumentId) => {
+                if (trainerDocumentId) {
+                    // Set initial values in the form
+                    document.getElementById('editTrainerName').value = name;
+                    document.getElementById('editPhoneNumber').value = phoneNumber;
+                    document.getElementById('editActivity').checked = activity;
+                    document.getElementById('editHistory').value = history;
+
+                    editTrainerForm.addEventListener('submit', function (event) {
+                        event.preventDefault();
+                        // Handle form submission and update Firestore
+                        var updatedName = document.getElementById('editTrainerName').value;
+                        var updatedPhoneNumber = document.getElementById('editPhoneNumber').value;
+                        var updatedActivity = document.getElementById('editActivity').checked;
+                        var updatedHistory = document.getElementById('editHistory').value;
+
+                        // Update the user details in Firestore using the retrieved document ID
+                        firestore.collection('trainer').doc(trainerDocumentId).update({
+                            Name: updatedName,
+                            phoneNumber: updatedPhoneNumber,
+                            Activity: updatedActivity,
+                            // Update other fields here
+                        }).then(() => {
+                            alert('User details updated successfully');
+                            // Close the modal after updating
+                            window.location.href = 'trainer-details.html';
+                        }).catch((error) => {
+                            console.error('Error updating user details: ', error);
+                        });
+                    });
+
+                    $('#trainerDetailsModal').modal('show');
+                }
+            });
+        }
+
+        function getTrainerDocumentIdByUniqueId(uniqueId) {
+            return firestore.collection('trainer').where('uniqueID', '==', uniqueId).get()
+                .then((querySnapshot) => {
+                    if (querySnapshot.size > 0) {
+                        return querySnapshot.docs[0].id;
+                    } else {
+                        console.error('User not found with the provided uniqueID.');
+                        return null;
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error retrieving user document ID: ', error);
+                    return null;
+                });
+        }
+
+
+        function signOut() {
+            auth.signOut().then(function () {
+                // Sign-out successful.
+                console.log("Admin signed out");
+                alert("Admin signed out Successfully");
+                // Redirect to the sign-in or home page if needed
+                window.location.href = "index.html";
+            }).catch(function (error) {
+                // An error happened.
+                console.error("Error signing out:", error);
+
+            });
+        }
+
+        // Add this function to check if the user is signed in on each page load
+        function checkAuthState() {
+            auth.onAuthStateChanged(function (user) {
+                if (!user) {
+                    // If the user is not signed in, redirect to the sign-in or home page
+                    window.location.href = "index.html";
+                }
+            });
+        }
+
+        // Call the checkAuthState function when the page loads
+        checkAuthState();
+
+
+
+    </script>
+</body>
+
+</html>

@@ -29,7 +29,7 @@ function login() {
             const user = auth.currentUser;
 
             // Check user role in Firestore
-            firestore.collection('admins').doc(user.uid).get()
+            firestore.collection('admins').doc('admin').get()
                 .then((doc) => {
                     if (doc.exists) {
                         const role = doc.data().role;

@@ -157,6 +157,32 @@
       color: #becb65 !important;
       font-weight: bold;
     }
+
+    .custom-checkbox {
+      width: 1.25em;
+      height: 1.25em;
+      background-color: black;
+      /* Change this to your desired color */
+      border: 1px solid #777776;
+      /* Border color */
+      border-radius: 50%;
+      /* Make it a circle */
+      cursor: pointer;
+      margin-right: 5px;
+      /* Adjust as needed */
+    }
+
+    /* Color when the checkbox is checked */
+    .custom-checkbox:checked {
+      background-color: #B4DA04;
+      /* Change this to your desired color */
+    }
+
+    /* Color of the label next to the checkbox */
+    .form-check-label {
+      color: #D5FA05 !important;
+      /* Change this to your desired color */
+    }
   </style>
 </head>
 
@@ -215,8 +241,27 @@
           <label for="announcementDate">Announcement Date:</label>
           <input type="date" id="announcementDate" class="form-control mb-3">
 
+          <!-- Centered Circle Box Options -->
+          <div class="d-flex justify-content-center align-items-center flex-row mb-3">
+            <div class="form-check form-check-inline text-center">
+              <input class="form-check-input custom-checkbox" type="radio" name="userType" id="bothOption" value="both"
+                checked onchange="updateAnnouncementData()">
+              <label class="form-check-label" for="bothOption">Both</label>
+            </div>
+            <div class="form-check form-check-inline text-center">
+              <input class="form-check-input custom-checkbox" type="radio" name="userType" id="clientOption"
+                value="client" onchange="updateAnnouncementData()">
+              <label class="form-check-label" for="clientOption">Client</label>
+            </div>
+            <div class="form-check form-check-inline text-center">
+              <input class="form-check-input custom-checkbox" type="radio" name="userType" id="trainerOption"
+                value="trainer" onchange="updateAnnouncementData()">
+              <label class="form-check-label" for="trainerOption">Trainer</label>
+            </div>
+          </div>
+
           <label for="announcementText">Announcement Text:</label>
-          <textarea class="form-control" id="announcementText" rows="4"></textarea>
+          <textarea class="form-control mb-3" id="announcementText" rows="4"></textarea>
         </div>
         <div class="text-center">
           <button type="submit" class="btn btn-primary" onclick="saveAnnouncement()">Save</button>
@@ -228,9 +273,8 @@
 
 
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-    crossorigin="anonymous"></script>
+
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
     crossorigin="anonymous"></script>
@@ -255,7 +299,7 @@
     var firestore = firebase.firestore();
     var auth = firebase.auth();
 
-    var docId = 'bannerUrl';
+    var docId = 'announcement';
 
     var loadingElement = document.getElementById('loading');
     var contentContainer = document.getElementById('contentContainer');
@@ -288,8 +332,6 @@
         console.error("Error fetching image from Firestore:", error);
       });
 
-
-
     function uploadImage() {
       var imageInput = document.getElementById('imageInput');
       var file = imageInput.files[0];
@@ -319,7 +361,7 @@
 
             // Get the download URL for the uploaded file
             uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
-              var docId = 'bannerUrl'; // Replace with your desired document ID
+              var docId = 'announcement'; // Replace with your desired document ID
               firestore.collection('importantDocs').doc(docId).set({
                 bannerUrl: downloadURL,
               }).then(function (docRef) {
@@ -352,6 +394,13 @@
       });
     }
 
+    var announcement = "";
+    var date = "";
+    var clientAnnouncement = "";
+    var clientDate = "";
+    var trainerAnnouncement = "";
+    var trainerDate = "";
+
     function openAnnouncementModal() {
       firestore.collection('importantDocs').doc('announcement').get()
         .then((doc) => {
@@ -363,6 +412,15 @@
             // Set values from Firestore document
             announcementDateInput.value = doc.data().date;
             announcementTextInput.value = doc.data().announcement;
+
+            announcement = announcementTextInput.value;
+            date = announcementDateInput.value;
+
+            clientAnnouncement = doc.data().clientAnnouncement;
+            clientDate = doc.data().clientDate;
+
+            trainerAnnouncement = doc.data().trainerAnnouncement;
+            trainerDate = doc.data().trainerDate;
 
             // Show the modal
             var announcementModal = new bootstrap.Modal(document.getElementById('announcementModal'));
@@ -380,16 +438,54 @@
         });
     }
 
+    // Function to update announcement data based on the selected checkbox
+    function updateAnnouncementData() {
+      var announcementDateInput = document.getElementById('announcementDate');
+      var announcementTextInput = document.getElementById('announcementText');
+
+      // Get the selected checkbox value
+      var userType = document.querySelector('input[name="userType"]:checked').value;
+
+      if (userType === 'both') {
+        announcementTextInput.value = announcement;
+        announcementDateInput.value = date;
+      } else if (userType === 'client') {
+        announcementTextInput.value = clientAnnouncement;
+        announcementDateInput.value = clientDate;
+      } else {
+        announcementTextInput.value = trainerAnnouncement;
+        announcementDateInput.value = trainerDate;
+      }
+
+      console.log('userType: ', userType);
+      console.log('announcement: ', announcementTextInput.value);
+      console.log('date: ', announcementDateInput.value);
+    }
+
+
     function saveAnnouncement() {
       var announcementDate = document.getElementById('announcementDate').value;
       var announcementText = document.getElementById('announcementText').value;
+      var userType = document.querySelector('input[name="userType"]:checked').value;
+
+      // Create an object to store the fields you want to update
+      var updateFields = {};
+
+      // Update fields based on userType
+      if (userType === 'both') {
+        updateFields.announcement = announcementText;
+        updateFields.date = announcementDate;
+      } else if (userType === 'client') {
+        updateFields.clientAnnouncement = announcementText;
+        updateFields.clientDate = announcementDate;
+      } else if (userType === 'trainer') {
+        updateFields.trainerAnnouncement = announcementText;
+        updateFields.trainerDate = announcementDate;
+      }
 
       // Perform save logic (upload to Firebase or any other desired action)
-      firestore.collection('importantDocs').doc('announcement').update({
-        announcement: announcementText,
-        date: announcementDate,
-        // Update other fields here
-      }).then(() => {
+      firestore.collection('importantDocs').doc('announcement').update(updateFields)
+      .then(() => {
         alert('Announcement has been made.');
         // Close the modal after updating
         var announcementModal = new bootstrap.Modal(document.getElementById('announcementModal'));

@@ -271,7 +271,7 @@
         if (trainerListElement) {
             // Fetch user details
             firestore.collection('trainer').get().then((querySnapshot) => {
-                var trainersArray = querySnapshot.docs.map(doc => doc.data());
+                var trainersArray = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
                 // Add input event listener to the search input for real-time filtering
                 var searchInput = document.getElementById('userSearchInput');
@@ -303,13 +303,15 @@
                 var trainerUniqueID = userData.uniqueID;
                 var trainerProfilePicture = userData.profilePicture;
                 var trainerActivity = userData.Activity;
+                var assignedUsers = userData.assignedUsers;
+                var trainerID = userData.id;
 
                 var listItem = document.createElement('li');
                 listItem.classList.add('d-flex', 'align-items-center', 'justify-content-between');
 
                 var imgElement = document.createElement('img');
                 imgElement.alt = 'Profile Picture';
-                imgElement.style.width = '60px'; 
+                imgElement.style.width = '60px';
                 imgElement.style.height = '60px';
                 imgElement.style.borderRadius = '50%';
                 imgElement.style.marginRight = '20px';
@@ -348,11 +350,11 @@
 
                 // Add event listeners to the buttons
                 totalClientsButton.addEventListener('click', function () {
-                    fetchUsers(trainerUniqueID, trainerActivity, 'total');
+                    fetchUsers(trainerID, assignedUsers, trainerActivity, 'total');
                 });
 
                 addClientsButton.addEventListener('click', function () {
-                    fetchUsers(trainerUniqueID, trainerActivity, 'add');
+                    fetchUsers(trainerID, assignedUsers, trainerActivity, 'add');
                 });
 
 
@@ -369,27 +371,62 @@
             });
         }
 
-        function fetchUsers(trainerID, activity, button) {
+        function fetchUsers(trainerID, assignedUsers, activity, button) {
             var totalUsers = [];
             var addUsers = [];
+            var notAssignedUsers = [];
 
-            firestore.collection('users').get().then((querySnapshot) => {
-                querySnapshot.forEach((doc) => {
-                    var userData = doc.data();
+            // Fetch not assigned users from 'admins' collection
+            firestore.collection('admins').doc('admin').get().then((doc) => {
+                if (doc.exists) {
+                    var adminData = doc.data();
+                    notAssignedUsers = adminData.notAssignedUsers || [];
+                } else {
+                    console.error('Admin document not found.');
+                }
 
+                console.log('Not Assigned Users:', notAssignedUsers);
 
-                    if (userData.trainer === trainerID) {
-                        totalUsers.push({ id: doc.id, ...userData });
-                    } else if (userData.trainer === '000000000') {
-                        addUsers.push({ id: doc.id, ...userData });
-                    }
+                // Fetch assigned users from 'users' collection
+                var assignedPromises = assignedUsers.map((docID) => {
+                    return firestore.collection('users').doc(docID).get().then((doc) => {
+                        if (doc.exists) {
+                            var userData = doc.data();
+                            totalUsers.push({ id: doc.id, ...userData });
+                        } else {
+                            console.error('Assigned user document not found:', docID);
+                        }
+                    }).catch((error) => {
+                        console.error('Error fetching assigned user: ', error);
+                    });
                 });
 
-                openModal(totalUsers, addUsers, button, trainerID)
+                // Fetch not assigned users from 'users' collection
+                var notAssignedPromises = notAssignedUsers.map((docID) => {
+                    return firestore.collection('users').doc(docID).get().then((doc) => {
+                        if (doc.exists) {
+                            var userData = doc.data();
+                            addUsers.push({ id: doc.id, ...userData });
+                        } else {
+                            console.error('Not assigned user document not found:', docID);
+                        }
+                    }).catch((error) => {
+                        console.error('Error fetching not assigned user: ', error);
+                    });
+                });
+
+                // Wait for all promises to resolve before opening the modal
+                Promise.all([...assignedPromises, ...notAssignedPromises]).then(() => {
+                    console.log('Total Users:', totalUsers);
+                    console.log('Add Users:', addUsers);
+                    openModal(totalUsers, addUsers, button, trainerID);
+                });
             }).catch((error) => {
-                console.error('Error fetching users: ', error);
+                console.error('Error fetching admins: ', error);
             });
         }
+
+
 
         function openModal(totalUsers, addUsers, button, trainerID) {
             var Modal = new bootstrap.Modal(document.getElementById('clientsModal'));
@@ -526,7 +563,7 @@
 
 
                 var saveButton = createButton('Save Changes', function () {
-                    removeClients(selectedUsers);
+                    removeClients(selectedUsers, trainerID);
                 });
 
                 // Append the button to the modalFooter
@@ -582,7 +619,7 @@
 
                 function displayUsersAdd(usersArray) {
                     selectedUsers = [];
-                    
+
                     usersArray.forEach(user => {
                         var userContainer = document.createElement('div');
                         userContainer.classList.add('d-flex', 'align-items-center');
@@ -704,84 +741,101 @@
         }
 
         function addClients(selectedUsers, trainerID) {
-            var updatePromises = [];
+            var trainerRef = firestore.collection('trainer').doc(trainerID);
 
-            selectedUsers.forEach(userId => {
-                var userRef = firestore.collection('users').doc(userId);
+            // Fetch the current assigned users of the trainer
+            trainerRef.get().then((doc) => {
+                if (doc.exists) {
+                    var currentAssignedUsers = doc.data().assignedUsers || [];
 
-                // Add the promise for the user update to the array
-                updatePromises.push(
-                    userRef.update({
-                        trainer: trainerID,
-                    })
-                        .then(() => {
-                            console.log(`User with ID ${userId} updated successfully.`);
-                        })
-                        .catch(error => {
-                            console.error(`Error updating user with ID ${userId}:`, error);
-                        })
-                );
+                    var updatedAssignedUsers = [...currentAssignedUsers, ...selectedUsers];
+
+                    // Update the assignedUsers field in the trainer document
+                    return trainerRef.update({
+                        assignedUsers: updatedAssignedUsers,
+                    });
+                } else {
+                    console.error('Trainer document not found:', trainerID);
+                    return Promise.reject('Trainer document not found');
+                }
+            }).then(() => {
+                return firestore.collection('admins').doc('admin').get();
+            }).then((adminDoc) => {
+                if (adminDoc.exists) {
+                    var currentNotAssignedUsers = adminDoc.data().notAssignedUsers || [];
+
+                    var updatedNotAssignedUsers = currentNotAssignedUsers.filter((userID) => !selectedUsers.includes(userID));
+
+                    return firestore.collection('admins').doc('admin').update({
+                        notAssignedUsers: updatedNotAssignedUsers,
+                    });
+                } else {
+                    console.error('Admin document not found.');
+                    return Promise.reject('Admin document not found');
+                }
+            }).then(() => {
+                console.log('Assigned users updated successfully.');
+
+                var Modal = new bootstrap.Modal(document.getElementById('clientsModal'));
+                Modal.hide();
+
+                alert('Trainer assigned to client successfully');
+                window.location.href = 'assign-trainer.html';
+            }).catch((error) => {
+                console.error('Error updating assigned users:', error);
             });
-
-            // Use Promise.all to wait for all updates to complete
-            Promise.all(updatePromises)
-                .then(() => {
-                    console.log('All user updates completed successfully.');
-
-                    // Close the modal after updating
-                    var Modal = new bootstrap.Modal(document.getElementById('clientsModal'));
-                    Modal.hide();
-
-                    // Perform any additional steps after closing the modal
-                    alert('User details updated successfully');
-                    window.location.href = 'assign-trainer.html';
-                })
-                .catch(error => {
-                    console.error('Error updating users:', error);
-                    // Handle errors if needed
-                });
         }
 
 
-        function removeClients(selectedUsers) {
-            var updatePromises = [];
 
-            // Iterate through each selected user
-            selectedUsers.forEach(userId => {
-                var userRef = firestore.collection('users').doc(userId);
+        function removeClients(selectedUsers, trainerID) {
+            var trainerRef = firestore.collection('trainer').doc(trainerID);
 
-                // Add the promise for the user update to the array
-                updatePromises.push(
-                    userRef.update({
-                        trainer: '000000000', //give default trainer id
-                    })
-                        .then(() => {
-                            console.log(`User with ID ${userId} updated successfully.`);
-                        })
-                        .catch(error => {
-                            console.error(`Error updating user with ID ${userId}:`, error);
-                        })
-                );
+            // Fetch the current assigned users of the trainer
+            trainerRef.get().then((doc) => {
+                if (doc.exists) {
+                    var currentAssignedUsers = doc.data().assignedUsers || [];
+
+                    // Remove selected users from the assignedUsers array
+                    var updatedAssignedUsers = currentAssignedUsers.filter(userId => !selectedUsers.includes(userId));
+
+                    // Update the assignedUsers field in the trainer document
+                    return trainerRef.update({
+                        assignedUsers: updatedAssignedUsers,
+                    });
+                } else {
+                    console.error('Trainer document not found:', trainerID);
+                    return Promise.reject('Trainer document not found');
+                }
+            }).then(() => {
+                return firestore.collection('admins').doc('admin').get();
+            }).then((adminDoc) => {
+                if (adminDoc.exists) {
+                    var currentNotAssignedUsers = adminDoc.data().notAssignedUsers || [];
+
+                    var updatedNotAssignedUsers = [...currentNotAssignedUsers, ...selectedUsers];
+
+                    return firestore.collection('admins').doc('admin').update({
+                        notAssignedUsers: updatedNotAssignedUsers,
+                    });
+                } else {
+                    console.error('Admin document not found.');
+                    return Promise.reject('Admin document not found');
+                }
+            }).then(() => {
+                console.log('Assigned users removed successfully.');
+
+                var Modal = new bootstrap.Modal(document.getElementById('clientsModal'));
+                Modal.hide();
+
+                alert('Client removed successfully');
+                window.location.href = 'assign-trainer.html';
+            }).catch((error) => {
+                console.error('Error removing assigned users:', error);
             });
-
-            // Use Promise.all to wait for all updates to complete
-            Promise.all(updatePromises)
-                .then(() => {
-                    console.log('All user updates completed successfully.');
-
-                    // Close the modal after updating
-                    var Modal = new bootstrap.Modal(document.getElementById('clientsModal'));
-                    Modal.hide();
-
-                    // Perform any additional steps after closing the modal
-                    alert('User details updated successfully');
-                    window.location.href = 'assign-trainer.html';
-                })
-                .catch(error => {
-                    console.error('Error updating users:', error);
-                    // Handle errors if needed
-                });
         }
+
+
 
         function signOut() {
             auth.signOut().then(function () {

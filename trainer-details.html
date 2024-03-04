@@ -191,6 +191,7 @@
             cursor: pointer;
             font-weight: 500;
             box-shadow: #D5FA05 !important;
+            white-space: nowrap;
         }
 
         .btn-search:hover {
@@ -235,7 +236,7 @@
                 <form class="search-form d-flex mb-3">
                     <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"
                         id="userSearchInput">
-                    <button class="btn btn-search" type="button">Search</button>
+                        <button id="totaltrainerButton" class="btn btn-search" type="button">Total</button>
                 </form>
                 <ul id="trainerList" class="list-group"></ul>
             </div>
@@ -309,6 +310,9 @@
             // Fetch user details
             firestore.collection('trainer').get().then((querySnapshot) => {
                 var trainersArray = querySnapshot.docs.map(doc => doc.data());
+
+                var totaltrainerButton = document.getElementById('totaltrainerButton');
+                totaltrainerButton.innerText = `${trainersArray.length} Trainers`;
 
                 // Add input event listener to the search input for real-time filtering
                 var searchInput = document.getElementById('userSearchInput');

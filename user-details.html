@@ -142,6 +142,8 @@
             color: white;
             border: 1px solid #383838B2;
             border-radius: 5px;
+            outline: none;
+            box-shadow: 0 0 5px rgba(217, 255, 0, 0.7);
         }
 
 
@@ -192,10 +194,11 @@
             cursor: pointer;
             font-weight: 500;
             box-shadow: #D5FA05 !important;
+            white-space: nowrap;
         }
 
         .btn-search:hover {
-            background-color:#D5FA05 !important;
+            background-color: #D5FA05 !important;
             color: #121212;
         }
 
@@ -236,7 +239,7 @@
                 <form class="search-form d-flex mb-3">
                     <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"
                         id="userSearchInput">
-                    <button class="btn btn-search" type="button">Search</button>
+                    <button id="totalUserButton" class="btn btn-search" type="button">Total</button>
                 </form>
                 <ul id="userList" class="list-group"></ul>
             </div>
@@ -305,32 +308,59 @@
         var auth = firebase.auth();
 
         var userListElement = document.getElementById('userList');
+        var userDataFetched = localStorage.getItem('userDataFetched');
 
         if (userListElement) {
-            // Fetch user details
-            firestore.collection('users').get().then((querySnapshot) => {
-                var usersArray = querySnapshot.docs.map(doc => doc.data());
+            if (!userDataFetched) {
+                // Fetch user details only if userDataFetched is not true
+                firestore.collection('users').get().then((querySnapshot) => {
+                    var usersArray = querySnapshot.docs.map(doc => doc.data());
 
-                // Add input event listener to the search input for real-time filtering
-                var searchInput = document.getElementById('userSearchInput');
-                searchInput.addEventListener('input', function () {
-                    var searchTerm = searchInput.value.toLowerCase();
+                    var totalUserButton = document.getElementById('totalUserButton');
+                    totalUserButton.innerText = `${usersArray.length} Users`;
 
-                    // Filter users based on the search term
-                    var filteredUsers = usersArray.filter(user =>
-                        user.Name.toLowerCase().includes(searchTerm) || user.uniqueID.includes(searchTerm)
-                    );
+                    // Add input event listener to the search input for real-time filtering
+                    var searchInput = document.getElementById('userSearchInput');
+                    searchInput.addEventListener('input', function () {
+                        var searchTerm = searchInput.value.toLowerCase();
+                        var filteredUsers = usersArray.filter(user =>
+                            user.Name.toLowerCase().includes(searchTerm) || user.uniqueID.includes(searchTerm)
+                        );
 
-                    // Clear existing content and display the filtered users
-                    userListElement.innerHTML = '';
-                    displayUsers(filteredUsers);
+                        userListElement.innerHTML = '';
+                        displayUsers(filteredUsers);
+                    });
+                    console.log('fetching users data');
+
+                    displayUsers(usersArray);
+
+                    // Set userDataFetched to true and store it in localStorage
+                    userDataFetched = true;
+                    localStorage.setItem('userDataFetched', userDataFetched);
+                }).catch((error) => {
+                    console.error('Error fetching user details: ', error);
                 });
+            } else {
+                // If userDataFetched is true, retrieve the user data from localStorage
+                var cachedUsersArray = JSON.parse(localStorage.getItem('cachedUsersArray'));
+                if (cachedUsersArray) {
+                    var totalUserButton = document.getElementById('totalUserButton');
+                    totalUserButton.innerText = `${cachedUsersArray.length} Users`;
 
-                // Display all users initially
-                displayUsers(usersArray);
-            }).catch((error) => {
-                console.error('Error fetching user details: ', error);
-            });
+                    var searchInput = document.getElementById('userSearchInput');
+                    searchInput.addEventListener('input', function () {
+                        var searchTerm = searchInput.value.toLowerCase();
+                        var filteredUsers = cachedUsersArray.filter(user =>
+                            user.Name.toLowerCase().includes(searchTerm) || user.uniqueID.includes(searchTerm)
+                        );
+
+                        userListElement.innerHTML = '';
+                        displayUsers(filteredUsers);
+                    });
+
+                    displayUsers(cachedUsersArray);
+                }
+            }
         } else {
             console.error('User list element not found in the document.');
         }
@@ -346,11 +376,11 @@
                 var userHistory = userData.History;
 
                 var listItem = document.createElement('li');
-                listItem.classList.add('d-flex', 'align-items-center'); 
+                listItem.classList.add('d-flex', 'align-items-center');
 
                 var imgElement = document.createElement('img');
                 imgElement.alt = 'Profile Picture';
-                imgElement.style.width = '60px'; 
+                imgElement.style.width = '60px';
                 imgElement.style.height = '60px';
                 imgElement.style.borderRadius = '50%';
                 imgElement.style.marginRight = '10px';
@@ -393,6 +423,7 @@
                 var horizontalLine = document.createElement('hr');
                 userListElement.appendChild(horizontalLine);
             });
+            localStorage.setItem('cachedUsersArray', JSON.stringify(usersArray));
         }
 
         function showUserDetailsModal(name, phoneNumber, uniqueId, activity, history) {

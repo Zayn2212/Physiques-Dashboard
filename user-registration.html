@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+  <script src="https://cdn.jsdelivr.net/npm/@sendinblue/client@8"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Physique - User Registration</title>
@@ -183,7 +184,7 @@
           querySnapshot.forEach((doc) => {
             var trainerData = doc.data();
             var option = document.createElement("option");
-            option.value = trainerData.uniqueID;
+            option.value = doc.id;
             option.text = trainerData.Name;
             trainerDropdown.add(option);
           });
@@ -224,25 +225,34 @@
             email: email,
             phoneNumber: phoneNumber,
             uniqueID: uniqueId,
-            CurrentWeight: null,
-            FatPercentage: null,
-            FitnessScore: null,
-            WaterLevel: null,
-            Mon: null,
-            Tue: null,
-            Wed: null,
-            Thu: null,
-            Fri: null,
-            Sat: null,
+            CurrentWeight: '100',
+            FatPercentage: '100',
+            FitnessScore: '100',
+            WaterLevel: '100',
+            Mon: 'Chest Workout',
+            Tue: 'Shoulder Workout',
+            Wed: 'Arms Workout',
+            Thu: 'Legs Workout',
+            Fri: 'Back Workout',
+            Sat: 'Chest & Tricep',
             profilePicture: null,
             trainer: selectedTrainerId,
             Activity: true,
             History: history,
+            role: 'user',
           })
             .then(() => {
-              alert('User registered successfully!');
-              // Redirect to user-registration page
-              window.location.href = 'user-registration.html';
+              firestore.collection('trainer').doc(selectedTrainerId).update({
+                assignedUsers: firebase.firestore.FieldValue.arrayUnion(user.uid)
+              })
+                .then(() => {
+                  alert('User registered successfully!');
+                  // Redirect to user-registration page
+                  window.location.href = 'user-registration.html';
+                })
+                .catch((error) => {
+                  console.error('Error updating assignedUsers subcollection: ', error);
+                });
             })
             .catch((error) => {
               console.error('Error adding user details to Firestore: ', error);
@@ -255,11 +265,42 @@
         });
     }
 
+    function sendOtpEmail(email, otp) {
+      const apiKey = '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';
+      const sendinblue = require('@sendinblue/client');
+      const { TransactionalEmailsApi, SendSmtpEmail } = sendinblue;
+
+      const apiInstance = new TransactionalEmailsApi();
+
+      const senderEmail = "physiques@gmail.com";  // Replace with your sender email address
+
+      const sendSmtpEmail = new SendSmtpEmail({
+        to: [{ email: email }],
+        templateId: 1,  // Replace with your Sendinblue template ID for OTP emails
+        params: { OTP: otp },  // Replace with the parameter name used in your template
+        sender: { email: senderEmail },
+      });
+
+      apiInstance.sendTransacEmail(sendSmtpEmail, apiKey)
+        .then(response => {
+          console.log("OTP email sent successfully:", response);
+        })
+        .catch(error => {
+          console.error("Error sending OTP email:", error);
+        });
+    }
+
+    function generateOTP() {
+      // Replace this with your actual OTP generation logic
+      return Math.floor(100000 + Math.random() * 900000).toString();
+    }
+
+
     function signOut() {
       auth.signOut().then(function () {
         // Sign-out successful.
         console.log("Admin signed out");
-        alert("Admin signed out Successfully" );
+        alert("Admin signed out Successfully");
         // Redirect to the sign-in or home page if needed
         window.location.href = "index.html";
       }).catch(function (error) {
